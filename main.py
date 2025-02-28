@@ -1,3 +1,4 @@
+import os
 import cv2
 import time
 from send_email import send_email
@@ -8,7 +9,15 @@ time.sleep(1)
 
 first_frame = None
 status_list = []
-count = 0
+count = 1
+
+
+def clean_folder():
+    folder = glob('images/*.png')
+    for image in folder:
+        os.remove(image)
+
+
 while True:
     status = 0
     check, frame = video.read()
@@ -38,16 +47,15 @@ while True:
             status = 1
             cv2.imwrite(f"images/{count}.png", frame)
             count = count + 1
-            file_names = glob('images/*.png')
-            index = int(len(file_names)/2)
-            image = file_names[index]
-            print(image)
+            all_images = glob('images/*.png')
+            index = int(len(all_images)/2)
+            image_with_object = all_images[index]
 
     status_list.append(status)
     status_list = status_list[-2:]
 
     if status_list[0] == 1 and status_list[1] == 0:
-        send_email()
+        send_email(image_with_object)
 
     cv2.imshow("My Web Cam", frame)
 
